@@ -44,7 +44,7 @@ public class PencilPaint extends PaintObject {
     public void paint(Graphics2D g) {
                 
         Stroke oldStroke = g.getStroke();
-        g.setStroke(new BasicStroke(thickness));
+		g.setStroke(new BasicStroke(thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.setColor(color);
         
         for(int pointIndex = points.length - 1; pointIndex >= 1; pointIndex--) {

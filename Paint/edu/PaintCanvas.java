@@ -21,6 +21,22 @@ public class PaintCanvas extends JPanel {
         history = new Vector();
         
     }
+
+    private void expandFor(PaintObject paintObject) {
+
+        if(paintObject == null) return;
+
+        Rectangle bounds = paintObject.getBoundingBox();
+        Dimension preferredSize = getPreferredSize();
+        int neededWidth = Math.max(preferredSize.width, bounds.x + bounds.width + 20);
+        int neededHeight = Math.max(preferredSize.height, bounds.y + bounds.height + 20);
+        if(neededWidth != preferredSize.width || neededHeight != preferredSize.height) {
+            setPreferredSize(new Dimension(neededWidth, neededHeight));
+            revalidate();
+            if(getParent() != null) getParent().revalidate();
+        }
+
+    }
     
     public void paintComponent(Graphics g) {
         
@@ -31,7 +47,7 @@ public class PaintCanvas extends JPanel {
         
         Rectangle clipBounds = g.getClipBounds();
         g.setColor(Color.white);
-        g.fillRect((int)clipBounds.getX(), (int)clipBounds.getX(), 
+        g.fillRect((int)clipBounds.getX(), (int)clipBounds.getY(), 
                     (int)clipBounds.getWidth(), (int)clipBounds.getHeight());
         
         Iterator paintObjectIterator = paintObjects.iterator();
@@ -60,6 +76,7 @@ public class PaintCanvas extends JPanel {
     public void setTemporaryObject(PaintObject temporaryObject) {
         
         this.temporaryObject = temporaryObject;
+		expandFor(temporaryObject);
         repaint();
         
     }
@@ -75,6 +92,7 @@ public class PaintCanvas extends JPanel {
         
         history.addElement(new Vector(paintObjects));
         paintObjects.addElement(newObject);
+		expandFor(newObject);
         repaint();
         
     }
@@ -89,9 +107,17 @@ public class PaintCanvas extends JPanel {
 
     public void undo() { 
         
+        if(history.isEmpty()) return;
         paintObjects = (Vector)history.lastElement();
         history.removeElement(history.lastElement());
+        repaint();
         
+    }
+
+    public boolean canUndo() {
+
+        return !history.isEmpty();
+
     }
 
 
